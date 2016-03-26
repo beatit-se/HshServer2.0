@@ -19,6 +19,7 @@ public class Sensor   implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="home_id")
     private Home home;
