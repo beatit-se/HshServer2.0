@@ -1,7 +1,6 @@
 package se.beatit.hshserver.entities;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -10,7 +9,6 @@ import java.util.Date;
  */
 @Entity
 @Table(name="electricityconsumption")
-@XmlRootElement
 public class ElectricityConsumption implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -11,6 +11,7 @@ import se.beatit.hshserver.repositories.SensorRepository;
 import se.beatit.hshserver.repositories.TemperatureRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by stefan on 3/13/16.
@@ -51,14 +52,16 @@ public class TemperatureService {
     }
 
     public Map<String,Float> getCurrentTemperatures(Home home) {
-        Map<String,Float> result = new HashMap<String,Float>();
-        home.getSensor().forEach(s -> result.put(s.getName(), getCurrentTemperature(s).getTemperature()));
+        //Map<String,Float> result = new HashMap<String,Float>();
+        //home.getSensor().forEach(s -> result.put(s.getName(), getCurrentTemperature(s).getTemperature()));
 
-        return result;
+        return home.getSensor().stream().collect(Collectors.toMap(Sensor::getName, s -> getCurrentTemperature(s)));
+
+        //return result;
     }
 
-    public Temperature getCurrentTemperature(Sensor sensor) {
-        return repo.findLatestForSensor(sensor);
+    public Float getCurrentTemperature(Sensor sensor) {
+        return repo.findLatestForSensor(sensor).getTemperature();
     }
 
     /*

@@ -3,7 +3,6 @@ package se.beatit.hshserver.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -12,7 +11,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name="home")
-@XmlRootElement
 public class Home implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -22,7 +20,6 @@ public class Home implements Serializable {
 
     private String name;
 
-    @JsonIgnore
     @OneToMany(mappedBy="home", fetch = FetchType.EAGER)
     private Set<ElectricityConsumption> electricityConsumption;
 

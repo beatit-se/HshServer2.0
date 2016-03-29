@@ -19,14 +19,12 @@ public class Sensor   implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="home_id")
     private Home home;
 
     private String name;
 
-    @JsonIgnore
     @OneToMany(mappedBy="sensor", fetch = FetchType.EAGER)
     private Set<Temperature> temperature;
 
@@ -67,7 +65,6 @@ public class Sensor   implements Serializable {
     }
 
 
-    @JsonIgnore
     public Set<Temperature> getTemperature() {
         return temperature;
     }
