@@ -1,17 +1,18 @@
 package se.beatit.hshserver.rest.resource;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import se.beatit.hshserver.entities.Home;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Created by stefan on 3/25/16.
  */
 @XmlRootElement
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class HomeRS implements Serializable {
     private String name;
     private Map<String, Float> currentTemperatures;
