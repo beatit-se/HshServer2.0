@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -26,7 +27,7 @@ public class Sensor   implements Serializable {
     private String name;
 
     @OneToMany(mappedBy="sensor", fetch = FetchType.EAGER)
-    private Set<Temperature> temperature;
+    private Set<Temperature> temperature = Collections.EMPTY_SET;
 
     public Sensor() {
     }

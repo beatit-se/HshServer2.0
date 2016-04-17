@@ -9,6 +9,8 @@ import se.beatit.hshserver.service.ElectricityService;
 import se.beatit.hshserver.service.HomeService;
 import se.beatit.hshserver.service.TemperatureService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -17,6 +19,8 @@ import java.util.Date;
 @RestController
 @RequestMapping("/homes")
 public class Homes {
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat(HomeRS.DATE_FORMAT);
 
     @Autowired
     private HomeService homeService;
@@ -37,26 +41,34 @@ public class Homes {
     public HomeRS getHome(@PathVariable String homename) {
         Home home = homeService.findByName(homename);
 
-        HomeRS homeDTO = new HomeRS(home);
-        homeDTO.setName(home.getName());
-        homeDTO.setCurrentElectricityUsage(electricityService.getCurrentUsage(home));
-        homeDTO.setCurrentTemperatures(temperatureService.getCurrentTemperatures(home));
+        HomeRS homeRS = new HomeRS(home);
+        homeRS.setName(home.getName());
+        homeRS.setCurrentElectricityUsage(electricityService.getCurrentUsage(home));
+        homeRS.setCurrentTemperatures(temperatureService.getCurrentTemperatures(home));
 
-        return homeDTO;
+        return homeRS;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = {"{homename}/history/{fromdate}/{todate}"})
     public HomeRS getHome(@PathVariable String homename, @PathVariable String fromdate, @PathVariable String todate) {
         Home home = homeService.findByName(homename);
 
-        HomeRS homeDTO = new HomeRS(home);
-        homeDTO.setName(home.getName());
-        homeDTO.setCurrentElectricityUsage(electricityService.getCurrentUsage(home));
-        homeDTO.setCurrentTemperatures(temperatureService.getCurrentTemperatures(home));
+        HomeRS homeRS = new HomeRS(home);
+        homeRS.setName(home.getName());
+        homeRS.setCurrentElectricityUsage(electricityService.getCurrentUsage(home));
+        homeRS.setCurrentTemperatures(temperatureService.getCurrentTemperatures(home));
 
-        //TODO: Add history for temp and wh
+        try {
+            Date from = dateFormat.parse(fromdate);
+            Date to = dateFormat.parse(todate);
 
-        return homeDTO;
+            homeRS.setElectricityConsumptionHistory(electricityService.getHistoricUsage(home, from, to));
+            homeRS.setTemperatureHistory(temperatureService.getHistoricTemperatures(home,from,to));
+        } catch (ParseException e) {
+            //TODO: handle errors
+        }
+
+        return homeRS;
     }
 
     @RequestMapping(method = RequestMethod.POST, value = {"{homename}/electricity/{wh}"})
@@ -71,5 +83,24 @@ public class Homes {
         Home home = homeService.findByName(homename);
         temperatureService.addTemperature(home, sensor, temperature);
         return "OK, temperature added";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "test")
+    public HomeRS test() {
+        String home = "furubo";
+        String sensor1 = "inside";
+        String sensor2 = "outside";
+
+        if(homeService.findByName(home) == null) {
+            createHome(home);
+        }
+
+        addTemperature(home, sensor1, 21.4f);
+        addTemperature(home, sensor2, -1.4f);
+        addElectricityConsumption(home, 32l);
+
+        return getHome(home, "2016-04-17", "2016-04-18");
+
+
     }
 }

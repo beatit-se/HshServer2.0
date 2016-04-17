@@ -1,5 +1,6 @@
 package se.beatit.hshserver.rest.resource;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import se.beatit.hshserver.entities.Home;
 
@@ -20,7 +21,10 @@ public class HomeRS implements Serializable {
     private Date timestamp = new Date();
 
     private Map<Date, Long> electricityConsumptionHistory;
-    private Map<Date, Float> temperatureHistory;
+    private Map<String, Map<Date, Float>> temperatureHistory;
+
+    @JsonIgnore
+    public final static String DATE_FORMAT = "yyyy-MM-dd";
 
     public HomeRS() {
     }
@@ -69,11 +73,11 @@ public class HomeRS implements Serializable {
         this.electricityConsumptionHistory = electricityConsumptionHistory;
     }
 
-    public Map<Date, Float> getTemperatureHistory() {
+    public Map<String, Map<Date, Float>> getTemperatureHistory() {
         return temperatureHistory;
     }
 
-    public void setTemperatureHistory(Map<Date, Float> temperatureHistory) {
+    public void setTemperatureHistory(Map<String, Map<Date, Float>> temperatureHistory) {
         this.temperatureHistory = temperatureHistory;
     }
 }

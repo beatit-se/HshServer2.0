@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -21,10 +22,10 @@ public class Home implements Serializable {
     private String name;
 
     @OneToMany(mappedBy="home", fetch = FetchType.EAGER)
-    private Set<ElectricityConsumption> electricityConsumption;
+    private Set<ElectricityConsumption> electricityConsumption = Collections.EMPTY_SET;
 
     @OneToMany(mappedBy="home", fetch = FetchType.LAZY)
-    private Set<Sensor> sensor;
+    private Set<Sensor> sensor = Collections.EMPTY_SET;
 
     public Home() {}
 

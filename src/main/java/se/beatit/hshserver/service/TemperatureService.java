@@ -52,38 +52,19 @@ public class TemperatureService {
     }
 
     public Map<String,Float> getCurrentTemperatures(Home home) {
-        //Map<String,Float> result = new HashMap<String,Float>();
-        //home.getSensor().forEach(s -> result.put(s.getName(), getCurrentTemperature(s).getTemperature()));
-
         return home.getSensor().stream().collect(Collectors.toMap(Sensor::getName, s -> getCurrentTemperature(s)));
-
-        //return result;
     }
 
     public Float getCurrentTemperature(Sensor sensor) {
         return repo.findLatestForSensor(sensor).getTemperature();
     }
 
-    /*
-    public List<Temperature> getHistoricalTemperatures(Home home, String sensor, long from, long to, long timeResolution) {
-        List<Temperature> temperatures = new ArrayList<Temperature>();
-
-        Map<Date, Temperature> result = new HashMap<Date, Temperature>();
-        Iterable<Temperature> all = repo.findAll();
-
-        all.forEach(temperature -> mapToCorrect(temperature, result));
-
-        return result.values();
+    public Map<String,Map<Date,Float>> getHistoricTemperatures(Home home, Date from, Date to) {
+        return home.getSensor().stream().collect(Collectors.toMap(Sensor::getName, s -> getHistoricTemperatures(s, from, to)));
     }
 
-    private void mapToCorrect(Temperature temperature, Map<Date, Temperature> result) {
-        Date date = DateUtils.round(temperature.getTimestamp(), Calendar.DAY_OF_YEAR);
-
-        Temperature sumTemp = (result.get(date) == null) ? new Temperature() : result.get(date);
-        sumTemp.setTimestamp(date);
-        sumTemp.setTemperature();
-        temperature.getTimestamp()
+    public Map<Date, Float> getHistoricTemperatures(Sensor sensor, Date from, Date to) {
+        List<Temperature> temperatures = repo.findForSensor(sensor, from, to);
+        return temperatures.stream().collect(Collectors.toMap(Temperature::getTimestamp, Temperature::getTemperature));
     }
-    */
-
 }

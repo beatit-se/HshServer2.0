@@ -8,7 +8,8 @@ import se.beatit.hshserver.entities.ElectricityConsumption;
 import se.beatit.hshserver.entities.Home;
 import se.beatit.hshserver.repositories.ElectricityRepository;
 
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by stefan on 3/13/16.
@@ -54,5 +55,30 @@ public class ElectricityService {
         long watts = (ec.getWhUsed() * calcHelper) / ((deltaMs * calcHelper)/ DateUtils.MILLIS_PER_HOUR);
 
         return watts;
+    }
+
+    public Map<Date, Long> getHistoricUsage(Home home, Date from, Date to) {
+
+        List<ElectricityConsumption> electricityConsumption = repo.find(home, from,to);
+        Map<Date, Long> historyResult = new HashMap<Date, Long>();
+
+        //if(to.getTime() - from.getTime() < DateUtils.MILLIS_PER_DAY) {
+            electricityConsumption.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.HOUR));
+        //} else {
+
+         //   electricityConsumption.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.DAY_OF_YEAR));
+        //}
+
+        return historyResult;
+    }
+
+    private void addToHistoryGrouped(ElectricityConsumption ec, Map<Date, Long> historyResult, int goupByCalendarConstant) {
+        Date keyDate = DateUtils.round(ec.getFromDate(), goupByCalendarConstant);
+        Long sum = ec.getWhUsed();
+
+        if (historyResult.containsKey(keyDate)) {
+            sum += historyResult.get(keyDate);
+        }
+        historyResult.put(keyDate, sum);
     }
 }
