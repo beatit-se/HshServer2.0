@@ -60,11 +60,60 @@ public class TemperatureService {
     }
 
     public Map<String,Map<Date,Float>> getHistoricTemperatures(Home home, Date from, Date to) {
-        return home.getSensor().stream().collect(Collectors.toMap(Sensor::getName, s -> getHistoricTemperatures(s, from, to)));
+        return new HashMap<String,Map<Date,Float>>(home.getSensor().stream().collect(
+                Collectors.toMap(Sensor::getName, s -> getHistoricTemperatures(s, from, to))));
     }
 
     public Map<Date, Float> getHistoricTemperatures(Sensor sensor, Date from, Date to) {
         List<Temperature> temperatures = repo.findForSensor(sensor, from, to);
-        return temperatures.stream().collect(Collectors.toMap(Temperature::getTimestamp, Temperature::getTemperature));
+        Map<Date, AverageTemperatureHelper> historyResult = new HashMap<Date, AverageTemperatureHelper>();
+
+        temperatures.forEach(t -> addToHistoryGrouped(t, historyResult, Calendar.MINUTE));
+        //temperatures.forEach(t -> addToHistoryGrouped(t, historyResult, Calendar.HOUR));
+        //temperatures.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.DATE));
+        //temperatures.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.MONTH));
+        //temperatures.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.YEAR));
+
+        return historyResult.values().stream().collect(
+                Collectors.toMap(AverageTemperatureHelper::getTime, AverageTemperatureHelper::getAverageTemperature));
+    }
+
+    private void addToHistoryGrouped(Temperature t, Map<Date, AverageTemperatureHelper> historyResult, int goupByCalendarConstant) {
+        Date keyDate = DateUtils.truncate(t.getTimestamp(), goupByCalendarConstant);
+        AverageTemperatureHelper ath;
+
+        if (historyResult.containsKey(keyDate)) {
+            ath = historyResult.get(keyDate);
+        } else {
+            ath = new AverageTemperatureHelper(keyDate);
+        }
+
+        ath.addTemperature(t.getTemperature());
+
+        historyResult.put(keyDate, ath);
+    }
+
+    private class AverageTemperatureHelper {
+        private Date time;
+        private float sumTemperature=0f;
+        private float count=0f;
+
+        public AverageTemperatureHelper(Date time) {
+            this.time = time;
+        }
+
+        public void addTemperature(float temperature) {
+            sumTemperature += temperature;
+            count++;
+        }
+
+        public float getAverageTemperature() {
+            return sumTemperature/count;
+        }
+
+        public Date getTime() {
+            return time;
+        }
+
     }
 }

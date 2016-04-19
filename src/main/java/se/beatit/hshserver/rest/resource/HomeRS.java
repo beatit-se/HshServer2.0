@@ -7,6 +7,7 @@ import se.beatit.hshserver.entities.Home;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +22,7 @@ public class HomeRS implements Serializable {
     private Date timestamp = new Date();
 
     private Map<Date, Long> electricityConsumptionHistory;
-    private Map<String, Map<Date, Float>> temperatureHistory;
+    private List<TemperatureSensorRS> temperatureHistory;
 
     @JsonIgnore
     public final static String DATE_FORMAT = "yyyy-MM-dd";
@@ -73,11 +74,11 @@ public class HomeRS implements Serializable {
         this.electricityConsumptionHistory = electricityConsumptionHistory;
     }
 
-    public Map<String, Map<Date, Float>> getTemperatureHistory() {
+    public List<TemperatureSensorRS> getTemperatureHistory() {
         return temperatureHistory;
     }
 
-    public void setTemperatureHistory(Map<String, Map<Date, Float>> temperatureHistory) {
+    public void setTemperatureHistory(List<TemperatureSensorRS> temperatureHistory) {
         this.temperatureHistory = temperatureHistory;
     }
 }

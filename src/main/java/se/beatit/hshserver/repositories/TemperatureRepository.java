@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface TemperatureRepository extends CrudRepository<Temperature, Long> {
 
-    @Query(value = "SELECT t FROM Temperature t WHERE t.timestamp in (SELECT max(t2.timestamp) FROM Temperature t2 WHERE t2.sensor = :sensor)")
+    @Query(value = "SELECT t FROM Temperature t WHERE t.sensor = :sensor AND t.timestamp in (SELECT max(t2.timestamp) FROM Temperature t2 WHERE t2.sensor = :sensor)")
     Temperature findLatestForSensor(@Param("sensor") Sensor sensor);
 
     @Query(value = "SELECT t FROM Temperature t WHERE t.sensor = :sensor and t.timestamp > :fromdate and t.timestamp < :todate")

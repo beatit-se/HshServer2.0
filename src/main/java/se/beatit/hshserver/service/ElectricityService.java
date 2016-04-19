@@ -62,23 +62,23 @@ public class ElectricityService {
         List<ElectricityConsumption> electricityConsumption = repo.find(home, from,to);
         Map<Date, Long> historyResult = new HashMap<Date, Long>();
 
-        //if(to.getTime() - from.getTime() < DateUtils.MILLIS_PER_DAY) {
-            electricityConsumption.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.HOUR));
-        //} else {
-
-         //   electricityConsumption.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.DAY_OF_YEAR));
-        //}
+        electricityConsumption.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.MINUTE));
+        //electricityConsumption.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.HOUR));
+        //electricityConsumption.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.DATE));
+        //electricityConsumption.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.MONTH));
+        //electricityConsumption.forEach(ec -> addToHistoryGrouped(ec, historyResult, Calendar.YEAR));
 
         return historyResult;
     }
 
     private void addToHistoryGrouped(ElectricityConsumption ec, Map<Date, Long> historyResult, int goupByCalendarConstant) {
-        Date keyDate = DateUtils.round(ec.getFromDate(), goupByCalendarConstant);
+        Date keyDate = DateUtils.truncate(ec.getFromDate(), goupByCalendarConstant);
         Long sum = ec.getWhUsed();
 
         if (historyResult.containsKey(keyDate)) {
             sum += historyResult.get(keyDate);
         }
+
         historyResult.put(keyDate, sum);
     }
 }
