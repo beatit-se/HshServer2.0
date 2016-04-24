@@ -17,12 +17,12 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HomeRS implements Serializable {
     private String name;
-    private Map<String, Float> currentTemperatures;
+    private TemperaturesRS currentTemperatures;
     private Long currentElectricityUsage;
     private Date timestamp = new Date();
 
     private Map<Date, Long> electricityConsumptionHistory;
-    private List<TemperatureSensorRS> temperatureHistory;
+    private List<TemperaturesRS> temperatureHistory;
 
     @JsonIgnore
     public final static String DATE_FORMAT = "yyyy-MM-dd";
@@ -42,11 +42,11 @@ public class HomeRS implements Serializable {
         this.name = name;
     }
 
-    public Map<String, Float> getCurrentTemperatures() {
+    public TemperaturesRS getCurrentTemperatures() {
         return currentTemperatures;
     }
 
-    public void setCurrentTemperatures(Map<String, Float> currentTemperatures) {
+    public void setCurrentTemperatures(TemperaturesRS currentTemperatures) {
         this.currentTemperatures = currentTemperatures;
     }
 
@@ -74,11 +74,11 @@ public class HomeRS implements Serializable {
         this.electricityConsumptionHistory = electricityConsumptionHistory;
     }
 
-    public List<TemperatureSensorRS> getTemperatureHistory() {
+    public List<TemperaturesRS> getTemperatureHistory() {
         return temperatureHistory;
     }
 
-    public void setTemperatureHistory(List<TemperatureSensorRS> temperatureHistory) {
+    public void setTemperatureHistory(List<TemperaturesRS> temperatureHistory) {
         this.temperatureHistory = temperatureHistory;
     }
 }

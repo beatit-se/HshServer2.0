@@ -40,7 +40,7 @@ public class ElectricityService {
 
 
     public long getCurrentUsage(Home home) {
-        //Om du låter en 60 W glödlampa lysa i en timme kommer den att konsumera 0,06 kWh,
+        // Om du låter en 60 W glödlampa lysa i en timme kommer den att konsumera 0,06 kWh,
         // vilket räknas ut så här:	(60 * 1)/1000 = 0,06
         // Så (watt * tiditimmar) / 1000 = kwh
         // och (watt * tiditimmar) / 1 = wh

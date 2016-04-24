@@ -4,8 +4,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import se.beatit.hshserver.entities.Home;
-import se.beatit.hshserver.rest.resource.HomeRS;
-import se.beatit.hshserver.rest.resource.TemperatureSensorRS;
+import se.beatit.hshserver.rest.resource.*;
 import se.beatit.hshserver.service.ElectricityService;
 import se.beatit.hshserver.service.HomeService;
 import se.beatit.hshserver.service.TemperatureService;
@@ -48,7 +47,9 @@ public class Homes {
         HomeRS homeRS = new HomeRS(home);
         homeRS.setName(home.getName());
         homeRS.setCurrentElectricityUsage(electricityService.getCurrentUsage(home));
-        homeRS.setCurrentTemperatures(temperatureService.getCurrentTemperatures(home));
+        homeRS.setCurrentTemperatures(new TemperaturesRS(
+                temperatureService.getCurrentTemperatures(home).entrySet().stream().
+                        map(s -> new TemperatureRS(s.getKey(), s.getValue())).collect(Collectors.toList())));
 
         return homeRS;
     }
@@ -60,7 +61,10 @@ public class Homes {
         HomeRS homeRS = new HomeRS(home);
         homeRS.setName(home.getName());
         homeRS.setCurrentElectricityUsage(electricityService.getCurrentUsage(home));
-        homeRS.setCurrentTemperatures(temperatureService.getCurrentTemperatures(home));
+        homeRS.setCurrentTemperatures(new TemperaturesRS(
+                temperatureService.getCurrentTemperatures(home).entrySet().stream().
+                        map(s -> new TemperatureRS(s.getKey(), s.getValue())).collect(Collectors.toList())));
+
 
         try {
             Date from = dateFormat.parse(fromdate);
@@ -77,22 +81,27 @@ public class Homes {
         return homeRS;
     }
 
-    private List<TemperatureSensorRS> createSensorHistory(Map<String, Map<Date, Float>> tempHistory) {
-        return tempHistory.keySet().stream().map(s -> new TemperatureSensorRS(s, tempHistory.get(s))).collect(Collectors.toList());
+    private List<TemperaturesRS> createSensorHistory(Map<String, Map<Date, Float>> tempHistory) {
+        return tempHistory.keySet().stream().map(s -> new TemperaturesRS(s, getTemperatureRSList(tempHistory.get(s)))).collect(Collectors.toList());
     }
 
+    private List<TemperatureRS> getTemperatureRSList(Map<Date, Float> dateFloatMap) {
+        return dateFloatMap.entrySet().stream().map(s -> new TemperatureRS(s.getKey(), s.getValue())).collect(Collectors.toList());
+    }
+
+
     @RequestMapping(method = RequestMethod.POST, value = {"{homename}/electricity/{wh}"})
-    public String addElectricityConsumption(@PathVariable String homename, @PathVariable Long wh) {
+    public ResultRS addElectricityConsumption(@PathVariable String homename, @PathVariable Long wh) {
         Home home = homeService.findByName(homename);
-        electricityService.addElectricityConsumption(home,wh, DateUtils.addMinutes(new Date(), -1), new Date());
-        return "OK, electricity consumption added";
+        electricityService.addElectricityConsumption(home, wh, DateUtils.addMinutes(new Date(), -1), new Date());
+        return new ResultRS("OK, electricity consumption added", ResultRS.RESULT_OK);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = {"{homename}/temperature/{sensor}/{temperature}"})
-    public String addTemperature(@PathVariable String homename, @PathVariable String sensor, @PathVariable Float temperature) {
+    public ResultRS addTemperature(@PathVariable String homename, @PathVariable String sensor, @PathVariable Float temperature) {
         Home home = homeService.findByName(homename);
         temperatureService.addTemperature(home, sensor, temperature);
-        return "OK, temperature added";
+        return new ResultRS("OK, temperature added", ResultRS.RESULT_OK);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "test")
@@ -101,17 +110,17 @@ public class Homes {
         String sensor1 = "inside";
         String sensor2 = "outside";
 
-        if(homeService.findByName(home) == null) {
+        if (homeService.findByName(home) == null) {
             createHome(home);
         }
 
-        addTemperature(home, sensor1, 21.4f+count);
-        addTemperature(home, sensor2, -1.4f-count);
-        addElectricityConsumption(home, 32l+(int)count);
+        addTemperature(home, sensor1, 21.4f + count);
+        addTemperature(home, sensor2, -1.4f - count);
+        addElectricityConsumption(home, 32l + (int) count);
 
         count++;
 
-        return getHome(home, "2016-04-17", "2016-04-20");
+        return getHome(home, "2016-04-20", "2016-04-30");
     }
 
     private static float count = 0f;
